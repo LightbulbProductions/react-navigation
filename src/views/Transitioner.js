@@ -99,6 +99,13 @@ class Transitioner extends React.Component<*, Props, State> {
       scenes: NavigationScenesReducer([], this.props.navigation.state),
     };
 
+    this.state.position.addListener((value) => {
+      // console.log('position', value);
+      this.props.onTransitionUpdate && this.props.onTransitionUpdate(
+        this._transitionProps,
+        value.value,
+      );
+    });
     this._prevTransitionProps = null;
     this._transitionProps = buildTransitionProps(props, this.state);
     this._isMounted = false;
@@ -123,7 +130,7 @@ class Transitioner extends React.Component<*, Props, State> {
     const nextScenes = NavigationScenesReducer(
       this.state.scenes,
       nextProps.navigation.state,
-      this.props.navigation.state
+      this.props.navigation.state,
     );
 
     if (nextScenes === this.state.scenes) {
@@ -260,7 +267,7 @@ class Transitioner extends React.Component<*, Props, State> {
         this._startTransition(
             this._queuedTransition.nextProps,
             this._queuedTransition.nextScenes,
-            this._queuedTransition.indexHasChanged
+            this._queuedTransition.indexHasChanged,
         );
         this._queuedTransition = null;
       } else {

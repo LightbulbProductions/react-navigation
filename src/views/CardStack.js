@@ -204,6 +204,7 @@ class CardStack extends Component<DefaultProps, Props, void> {
         render={this._render}
         style={this.props.style}
         onTransitionStart={this.props.onTransitionStart}
+        onTransitionUpdate={this.props.onTransitionUpdate}
         onTransitionEnd={this.props.onTransitionEnd}
       />
     );
@@ -213,7 +214,7 @@ class CardStack extends Component<DefaultProps, Props, void> {
     // props for the new screen
     transitionProps: NavigationTransitionProps,
     // props for the old screen
-    prevTransitionProps: NavigationTransitionProps
+    prevTransitionProps: NavigationTransitionProps,
   ) => {
     const isModal = this.props.mode === 'modal';
     // Copy the object so we can assign useNativeDriver below
@@ -221,7 +222,7 @@ class CardStack extends Component<DefaultProps, Props, void> {
     const transitionSpec = {
       ...this._getTransitionConfig(
         transitionProps,
-        prevTransitionProps
+        prevTransitionProps,
       ).transitionSpec,
     };
     if (
@@ -237,11 +238,11 @@ class CardStack extends Component<DefaultProps, Props, void> {
 
   _renderHeader(
     transitionProps: NavigationTransitionProps,
-    headerMode: HeaderMode
+    headerMode: HeaderMode,
   ): ?React.Element<*> {
     const headerConfig = this.props.router.getScreenConfig(
       transitionProps.navigation,
-      'header'
+      'header',
     ) || {};
 
     return (
@@ -254,21 +255,21 @@ class CardStack extends Component<DefaultProps, Props, void> {
         renderLeftComponent={(props: NavigationTransitionProps) => {
           const header = this.props.router.getScreenConfig(
             props.navigation,
-            'header'
+            'header',
           ) || {};
           return header.left;
         }}
         renderRightComponent={(props: NavigationTransitionProps) => {
           const header = this.props.router.getScreenConfig(
             props.navigation,
-            'header'
+            'header',
           ) || {};
           return header.right;
         }}
         renderTitleComponent={(props: NavigationTransitionProps) => {
           const header = this.props.router.getScreenConfig(
             props.navigation,
-            'header'
+            'header',
           ) || {};
           // When we return 'undefined' from 'renderXComponent', header treats them as not
           // specified and default 'renderXComponent' functions are used. In case of 'title',
@@ -306,17 +307,16 @@ class CardStack extends Component<DefaultProps, Props, void> {
 
   _reset(position: Animated.Value, resetToIndex: number, velocity: number): void {
     Animated.timing(position, {
-        toValue: resetToIndex,
-        duration: ANIMATION_DURATION,
-        useNativeDriver: position.__isNative,
-        velocity: velocity * GESTURE_ANIMATED_VELOCITY_RATIO,
-        bounciness: 0,
-      })
+      toValue: resetToIndex,
+      duration: ANIMATION_DURATION,
+      useNativeDriver: position.__isNative,
+      velocity: velocity * GESTURE_ANIMATED_VELOCITY_RATIO,
+      bounciness: 0,
+    })
       .start();
   }
 
   _goBack(props: NavigationTransitionProps, velocity: number) {
-
     const toValue = Math.ceil(props.navigationState.index - 1, 0);
 
     // set temporary index for gesture handler to respect until the action is
@@ -324,17 +324,17 @@ class CardStack extends Component<DefaultProps, Props, void> {
     this._immediateIndex = toValue;
 
     Animated.timing(props.position, {
-        toValue,
-        duration: ANIMATION_DURATION,
-        useNativeDriver: props.position.__isNative,
-        velocity: velocity * GESTURE_ANIMATED_VELOCITY_RATIO,
-        bounciness: 0,
-      })
-      .start(({finished}) => {
+      toValue,
+      duration: ANIMATION_DURATION,
+      useNativeDriver: props.position.__isNative,
+      velocity: velocity * GESTURE_ANIMATED_VELOCITY_RATIO,
+      bounciness: 0,
+    })
+      .start(({ finished }) => {
         this._immediateIndex = null;
         if (!this._isResponding) {
           this.props.navigation.dispatch(
-            NavigationActions.back({ key: props.scene.route.key })
+            NavigationActions.back({ key: props.scene.route.key }),
           );
         }
       });
@@ -360,7 +360,7 @@ class CardStack extends Component<DefaultProps, Props, void> {
       },
       onMoveShouldSetPanResponder: (
         event: { nativeEvent: { pageY: number, pageX: number } },
-        gesture: any
+        gesture: any,
       ) => {
         if (props.navigationState.index !== props.scene.index) {
           return false;
@@ -376,7 +376,7 @@ class CardStack extends Component<DefaultProps, Props, void> {
         const axisLength = isVertical
           ? layout.height.__getValue()
           : layout.width.__getValue();
-        const axisHasBeenMeasured = !! axisLength;
+        const axisHasBeenMeasured = !!axisLength;
 
         const positionMax = isVertical ?
           this.props.gestureResponseDistance :
@@ -414,11 +414,10 @@ class CardStack extends Component<DefaultProps, Props, void> {
         const value = clamp(index - 1, currentValue, index);
         props.position.setValue(value);
       },
-      onPanResponderTerminationRequest: (event: any, gesture: any) => {
+      onPanResponderTerminationRequest: (event: any, gesture: any) => 
         // Returning false will prevent other views from becoming responder while
         // the navigation view is the responder (mid-gesture)
-        return false;
-      },
+         false,
       onPanResponderRelease: (event: any, gesture: any) => {
         if (!this._isResponding) {
           return;
@@ -455,7 +454,7 @@ class CardStack extends Component<DefaultProps, Props, void> {
 
     const cardStackConfig = this.props.router.getScreenConfig(
       props.navigation,
-      'cardStack'
+      'cardStack',
     ) || {};
 
     const gesturesEnabled = typeof cardStackConfig.gesturesEnabled === 'boolean' ?
@@ -465,7 +464,8 @@ class CardStack extends Component<DefaultProps, Props, void> {
     return (
       <View
         {...handlers}
-        style={styles.container}>
+        style={styles.container}
+      >
         <View style={styles.scenes}>
           {props.scenes.map((scene: any) => this._renderScene({
             ...props,
@@ -492,12 +492,12 @@ class CardStack extends Component<DefaultProps, Props, void> {
     // props for the new screen
     transitionProps: NavigationTransitionProps,
     // props for the old screen
-    prevTransitionProps: NavigationTransitionProps
+    prevTransitionProps: NavigationTransitionProps,
   ): TransitionConfig {
     const defaultConfig = TransitionConfigs.defaultTransitionConfig(
       transitionProps,
       prevTransitionProps,
-      this.props.mode === 'modal'
+      this.props.mode === 'modal',
     );
     if (this.props.transitionConfig) {
       return {
@@ -511,11 +511,11 @@ class CardStack extends Component<DefaultProps, Props, void> {
 
   _renderInnerCard(
     SceneComponent: ReactClass<*>,
-    props: NavigationSceneRendererProps
+    props: NavigationSceneRendererProps,
   ): React.Element<*> {
     const header = this.props.router.getScreenConfig(
       props.navigation,
-      'header'
+      'header',
     );
     const headerMode = this._getHeaderMode();
     if (headerMode === 'screen') {
@@ -546,7 +546,7 @@ class CardStack extends Component<DefaultProps, Props, void> {
   }
 
   _getChildNavigation = (
-    scene: NavigationScene
+    scene: NavigationScene,
   ): NavigationScreenProp<*, NavigationAction> => {
     let navigation = this._childNavigationProps[scene.key];
     if (!navigation || navigation.state !== scene.route) {
@@ -567,15 +567,15 @@ class CardStack extends Component<DefaultProps, Props, void> {
     const { screenInterpolator } = this._getTransitionConfig();
     const style = screenInterpolator && screenInterpolator(props);
 
-    let panHandlers = null;
+    const panHandlers = null;
 
     const cardStackConfig = this.props.router.getScreenConfig(
       props.navigation,
-      'cardStack'
+      'cardStack',
     ) || {};
 
     const SceneComponent = this.props.router.getComponentForRouteName(
-      props.scene.route.routeName
+      props.scene.route.routeName,
     );
 
     return (
